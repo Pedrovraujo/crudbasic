@@ -19,7 +19,6 @@ public class Servico {
     @Autowired
     private Repositorio acao;
 
-    //Cadastrar pessoas
     public ResponseEntity<?> cadastrar(Pessoa obj){
         mensagem.setMensagem(("O nome precisa ser preenchido"));
         if (obj.getNome().equals("")) {
@@ -78,4 +77,6 @@ public class Servico {
         return new ResponseEntity<>(acao.save(obj), HttpStatus.OK);
     }
     }
+
+
 }

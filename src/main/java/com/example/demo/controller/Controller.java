@@ -6,6 +6,7 @@ import com.example.demo.repository.Repositorio;
 import com.example.demo.service.Servico;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,14 @@ public class Controller {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> remover(@PathVariable int id){
         return servico.remover(id);
+    }
+
+    @GetMapping("/selecionar")
+    public ResponseEntity<?> selecionar(){return servico.selecionar();
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<?> status(){
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
