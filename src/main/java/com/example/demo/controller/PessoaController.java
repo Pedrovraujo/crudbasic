@@ -8,11 +8,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class Controller {
+@RequestMapping("/pessoas")
+public class PessoaController {
 
 
     @Autowired
@@ -22,32 +22,32 @@ public class Controller {
     private Servico servico;
 
 
-    @PostMapping("/cadastrar")
+    @PostMapping("/")
     public ResponseEntity<?> cadastrar(@Valid @RequestBody Pessoa obj){
-        return servico.cadastrar(obj);
+        return new ResponseEntity<>(acao.save(obj), HttpStatus.CREATED);
     }
 
-    @GetMapping("/selecionar/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> selecionarPeloCodigo(@PathVariable int id){
         return servico.selecionarPeloCodigo(id);
     }
 
     @PutMapping("/editar")
-    public ResponseEntity<?> editar(@RequestBody Pessoa obj){
+    public ResponseEntity<?> editar(@Valid @RequestBody Pessoa obj){
         return servico.editar(obj);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> remover(@PathVariable int id){
         return servico.remover(id);
     }
 
-    @GetMapping("/selecionar")
+    @GetMapping("")
     public ResponseEntity<?> selecionar(){return servico.selecionar();
     }
 
     @GetMapping("/status")
     public ResponseEntity<?> status(){
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
