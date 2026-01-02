@@ -5,21 +5,20 @@ import com.example.demo.modelo.Pessoa;
 import com.example.demo.repository.Repositorio;
 import com.example.demo.service.Servico;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/pessoas")
+@RequiredArgsConstructor
 public class PessoaController {
 
+    Repositorio acao;
 
-    @Autowired
-    private Repositorio acao;
-
-    @Autowired
-    private Servico servico;
+    Servico servico;
 
 
     @PostMapping("/")

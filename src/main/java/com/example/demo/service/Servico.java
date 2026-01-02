@@ -4,20 +4,20 @@ package com.example.demo.service;
 import com.example.demo.modelo.Mensagem;
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.repository.Repositorio;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
+
 public class Servico {
 
-
-    @Autowired
-    private Mensagem mensagem;
-
-    @Autowired
-    private Repositorio acao;
+    Mensagem mensagem;
+    Repositorio acao;
 
 
     public ResponseEntity<?> selecionar (){
