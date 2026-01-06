@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 public class Servico {
 
-    Mensagem mensagem;
-    Repositorio acao;
+    private final Mensagem mensagem;
+    private final Repositorio acao;
 
 
     public ResponseEntity<?> selecionar (){

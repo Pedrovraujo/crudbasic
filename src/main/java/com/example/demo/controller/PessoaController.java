@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PessoaController {
 
-    Repositorio acao;
+    private final Repositorio acao;
 
-    Servico servico;
+    private final Servico servico;
 
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<?> cadastrar(@Valid @RequestBody Pessoa obj){
         return new ResponseEntity<>(acao.save(obj), HttpStatus.CREATED);
     }
@@ -41,12 +41,8 @@ public class PessoaController {
         return servico.remover(id);
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> selecionar(){return servico.selecionar();
     }
 
-    @GetMapping("/status")
-    public ResponseEntity<?> status(){
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 }
