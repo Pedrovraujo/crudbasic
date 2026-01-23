@@ -21,7 +21,7 @@ public class Pessoa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "O nome precisa ser informado ")
     private String nome;
@@ -30,7 +30,7 @@ public class Pessoa {
     private String trabalho;
 
     @Min(value = 1, message = "A idade precisa ser maior que 0")
-    private int idade;
+    private Integer idade;
 
 
 }
