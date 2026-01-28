@@ -1,13 +1,11 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.dto.PessoaDTO;
 import com.example.demo.modelo.Pessoa;
-import com.example.demo.repository.Repositorio;
-import com.example.demo.service.Servico;
+import com.example.demo.service.PessoaService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,33 +14,33 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PessoaController {
 
-    private final Repositorio acao;
 
-    private final Servico servico;
+    private final PessoaService servico;
 
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@Valid @RequestBody Pessoa obj){
-        return new ResponseEntity<>(acao.save(obj), HttpStatus.CREATED);
+    public ResponseEntity<?> cadastrar(@Valid @RequestBody PessoaDTO dto) {
+        return servico.cadastrar(dto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> selecionarPeloCodigo(@PathVariable int id){
+    public ResponseEntity<?> selecionarPeloCodigo(@PathVariable int id) {
         return servico.selecionarPeloCodigo(id);
     }
 
-    @PutMapping("/editar")
-    public ResponseEntity<?> editar(@Valid @RequestBody Pessoa obj){
-        return servico.editar(obj);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editar(@PathVariable int id,@Valid @RequestBody PessoaDTO dto) {;
+        return servico.editar(id,dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> remover(@PathVariable int id){
+    public ResponseEntity<?> remover(@PathVariable int id) {
         return servico.remover(id);
     }
 
     @GetMapping
-    public ResponseEntity<?> selecionar(){return servico.selecionar();
+    public ResponseEntity<?> selecionar() {
+        return servico.selecionar();
     }
 
 }
