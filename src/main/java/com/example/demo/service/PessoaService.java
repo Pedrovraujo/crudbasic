@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,16 +49,31 @@ public class PessoaService {
 
 
     public ResponseEntity<?> selecionar() {
-        return new ResponseEntity<>(acao.findAll(), HttpStatus.OK);
+        List<PessoaResponseDTO> lista = acao.findAll()
+                .stream()
+                .map(pessoa -> {
+                    PessoaResponseDTO dto = mapper.map(pessoa, PessoaResponseDTO.class);
+                    dto.setNomeServico(pessoa.getServico().getNomeTrabalho());
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(lista);
     }
 
     public ResponseEntity<?> selecionarPeloCodigo(Integer id) {
-        return (ResponseEntity<?>) acao.findById(id)
-                .<ResponseEntity<?>>map(pessoa ->  new ResponseEntity<>(pessoa, HttpStatus.OK))
-                .orElseGet(() -> {
-                    mensagem.setMensagem("Não foi encontrado nenhuma pessoa com esse código.");
-                    return new  ResponseEntity<>(mensagem, HttpStatus.NOT_FOUND);
-                });
+        Optional<Pessoa> pessoaOpt = acao.findById(id);
+
+        if (pessoaOpt.isEmpty()) {
+            mensagem.setMensagem("Não foi encontrada nenhuma pessoa com esse código.");
+            return new ResponseEntity<>(mensagem, HttpStatus.NOT_FOUND);
+        }
+
+        Pessoa pessoa = pessoaOpt.get();
+        PessoaResponseDTO dto = mapper.map(pessoa, PessoaResponseDTO.class);
+        dto.setNomeServico(pessoa.getServico().getNomeTrabalho());
+
+        return ResponseEntity.ok(dto);
     }
 
 

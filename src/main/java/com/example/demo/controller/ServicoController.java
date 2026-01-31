@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ServicoProteseDTO;
 import com.example.demo.modelo.Mensagem;
 import com.example.demo.modelo.ServicoProtese;
 import com.example.demo.repository.ServicoProteseRepository;
@@ -21,8 +22,8 @@ public class ServicoController {
     private final ServicoProteseRepository acao;
 
     @PostMapping
-    public ResponseEntity<?>cadastrar(@Valid @RequestBody ServicoProtese obj){
-        return new ResponseEntity<>(acao.save(obj), HttpStatus.CREATED);
+    public ResponseEntity<?>cadastrar(@Valid @RequestBody ServicoProteseDTO dto){
+        return servicoProteseService.cadastrar(dto);
     }
 
     @GetMapping
