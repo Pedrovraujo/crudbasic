@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/pessoas")
 @RequiredArgsConstructor
@@ -41,6 +44,12 @@ public class PessoaController {
     @GetMapping
     public ResponseEntity<?> selecionar() {
         return servico.selecionar();
+    }
+
+    @GetMapping("/data")
+    public ResponseEntity<?> listarPorData(@RequestParam String data) {
+        LocalDate dia = LocalDate.parse(data);
+        return servico.listarPorData(dia);
     }
 
 }

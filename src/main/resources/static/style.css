@@ -1,0 +1,161 @@
+:root {
+  --azul-escuro: #1E3A8A;
+  --azul: #2563EB;
+  --cinza-fundo: #f7f8fa;
+  --cinza-texto: #1F2937;
+  --cinza-borda: #E5E7EB;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--cinza-fundo);
+  margin: 0;
+  color: var(--cinza-texto);
+}
+
+.site-header {
+  text-align: center;
+  background: white;
+  border-bottom: 4px solid var(--azul);
+  padding: 10px 0;
+}
+
+.logo {
+  width: 250px;
+  height: auto;
+}
+
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+h2 {
+  color: var(--azul-escuro);
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--cinza-borda);
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.descricao {
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+button.btn, .btn-secondary {
+  padding: 10px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.btn {
+  background: var(--azul);
+  color: white;
+}
+
+.btn:hover {
+  background: var(--azul-escuro);
+}
+
+.btn-secondary {
+  background: #10b981;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #059669;
+}
+
+.btn-action {
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-edit { color: #3b82f6; }
+.btn-delete { color: #ef4444; }
+.btn-action:hover { transform: scale(1.1); }
+
+.success { color: #16a34a; }
+.error { color: #dc2626; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid var(--cinza-borda);
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: var(--azul);
+  color: white;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+footer {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  padding: 15px;
+  margin-top: 30px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--azul);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}

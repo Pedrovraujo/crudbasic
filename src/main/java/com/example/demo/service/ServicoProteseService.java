@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class ServicoProteseService {
@@ -24,7 +28,17 @@ public class ServicoProteseService {
     }
 
     public ResponseEntity<?> listar() {
-        return new ResponseEntity<>(acao.findAll(), HttpStatus.OK);
+        List<Map<String, Object>> lista = acao.findAll().stream()
+                .map(servico -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", servico.getId());
+                    map.put("nomeTrabalho", servico.getNomeTrabalho());
+                    map.put("descricao", servico.getDescricao()); // <-- garante que a descrição vá no JSON
+                    return map;
+                })
+                .toList();
+
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
 
 }

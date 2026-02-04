@@ -6,6 +6,7 @@ import com.example.demo.dto.PessoaResponseDTO;
 import com.example.demo.modelo.Mensagem;
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.modelo.ServicoProtese;
+import com.example.demo.modelo.StatusAtendimento;
 import com.example.demo.repository.PessoaRepositorio;
 import com.example.demo.repository.ServicoProteseRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +41,8 @@ public class PessoaService {
         Pessoa pessoa = mapper.map(dto, Pessoa.class);
         pessoa.setId(null);
         pessoa.setServico(servicoOpt.get());
+        pessoa.setStatus(dto.getStatus() != null ? dto.getStatus() : StatusAtendimento.PENDENTE);
+
 
         Pessoa salva = acao.save(pessoa);
 
@@ -54,6 +58,7 @@ public class PessoaService {
                 .map(pessoa -> {
                     PessoaResponseDTO dto = mapper.map(pessoa, PessoaResponseDTO.class);
                     dto.setNomeServico(pessoa.getServico().getNomeTrabalho());
+                    dto.setDescricaoServico(pessoa.getServico().getDescricao());
                     return dto;
                 })
                 .toList();
@@ -72,6 +77,7 @@ public class PessoaService {
         Pessoa pessoa = pessoaOpt.get();
         PessoaResponseDTO dto = mapper.map(pessoa, PessoaResponseDTO.class);
         dto.setNomeServico(pessoa.getServico().getNomeTrabalho());
+        dto.setDescricaoServico(pessoa.getServico().getDescricao());
 
         return ResponseEntity.ok(dto);
     }
@@ -94,19 +100,54 @@ public class PessoaService {
                     mensagem.setMensagem("Pessoa não encontrada.");
                     return new RuntimeException(mensagem.getMensagem());
                 });
-        ServicoProtese novoServico = servicoProteseRepository.findById(dto.getServicoId())
-                .orElseThrow(() -> {
-                    mensagem.setMensagem("Serviço não encontrado.");
-                    return new RuntimeException(mensagem.getMensagem());
-                });
+
+        if (dto.getServicoId() != null) {
+            ServicoProtese novoServico = servicoProteseRepository.findById(dto.getServicoId())
+                    .orElseThrow(() -> {
+                        mensagem.setMensagem("Serviço não encontrado.");
+                        return new RuntimeException(mensagem.getMensagem());
+                    });
+            pessoa.setServico(novoServico);
+        }
+
         pessoa.setNome(dto.getNome());
         pessoa.setIdade(dto.getIdade());
-        pessoa.setServico(novoServico);
+        pessoa.setDataAtendimento(dto.getDataAtendimento() != null ? dto.getDataAtendimento() : pessoa.getDataAtendimento());
+        pessoa.setStatus(dto.getStatus()!= null ? dto.getStatus() : pessoa.getStatus());
+        if (pessoa.getStatus() == null) {
+            pessoa.setStatus(StatusAtendimento.PENDENTE);
+        }
         Pessoa salva = acao.save(pessoa);
         PessoaResponseDTO resposta = mapper.map(salva, PessoaResponseDTO.class);
-        resposta.setNomeServico(novoServico.getNomeTrabalho());
+        resposta.setNomeServico(pessoa.getServico().getNomeTrabalho());
+        resposta.setDescricaoServico(pessoa.getServico().getDescricao());
+        dto.setStatus(pessoa.getStatus() != null ? pessoa.getStatus() : StatusAtendimento.PENDENTE);
 
         return ResponseEntity.ok(resposta);
     }
+
+    public ResponseEntity<?> listarPorData(LocalDate data) {
+        List<Pessoa> pessoas = acao.findByDataAtendimento(data);
+
+        if (pessoas.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<PessoaResponseDTO> lista = pessoas.stream()
+                .map(p -> {
+                    PessoaResponseDTO dto = mapper.map(p, PessoaResponseDTO.class);
+                    dto.setNomeServico(p.getServico().getNomeTrabalho());
+                    dto.setDescricaoServico(p.getServico().getDescricao());
+                    dto.setStatus(p.getStatus() != null ? p.getStatus() : StatusAtendimento.PENDENTE);
+                    return dto;
+                })
+                .toList();
+
+        return ResponseEntity.ok(lista);
+    }
+
+
+
+
 
 }
