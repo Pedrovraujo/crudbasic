@@ -32,7 +32,6 @@ public class PessoaDTO {
     private Integer idade;
 
     @NotNull(message = "A data precisa ser informada.")
-    @Column(name = "dataAtendimento")
     private LocalDate dataAtendimento;
 
     private StatusAtendimento status;

@@ -14,7 +14,7 @@ public class ServicoProteseDTO {
 
     @NotBlank(message = "O trabalho precisa ser informado")
     @Pattern(regexp = "^[\\p{L}\\s]+$", message = "O nome deve conter apenas letras.")
-    private String nome_trabalho;
+    private String nomeTrabalho;
 
     private String descricao;
 }

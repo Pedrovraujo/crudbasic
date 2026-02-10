@@ -1,20 +1,24 @@
 package com.example.demo.controller;
 
-import com.example.demo.security.JwtUtil;
+
+import com.example.demo.dto.LoginDTO;
+import com.example.demo.service.TokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class AuthController {
 
+    private final TokenService tokenService;
+
+
     @PostMapping
-    public ResponseEntity<?> login(@RequestParam String user, @RequestParam String pass) {
-        if ("admin".equals(user) && "1234".equals(pass)) {
-            String token = JwtUtil.generateToken(user);
-            return ResponseEntity.ok(token);
-        }
-        return ResponseEntity.status(401).body("Credenciais inválidas");
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+        return tokenService.login(loginDTO);
+
     }
+
 }
