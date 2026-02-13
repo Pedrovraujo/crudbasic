@@ -1,16 +1,11 @@
 package com.example.demo.modelo;
 
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Component
+@Data
 public class Mensagem {
-    public String getMensagem() {
-        return mensagem;
-    }
-
-    public void setMensagem(String mensagem) {
-        this.mensagem = mensagem;
-    }
 
     private String mensagem;
 }

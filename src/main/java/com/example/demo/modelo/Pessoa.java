@@ -1,64 +1,39 @@
 package com.example.demo.modelo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Entity
-@Table(name="pessoas")
+@Table(name = "pessoas")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Pessoa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @NotBlank(message = "O nome precisa ser informado ")
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
     private String nome;
 
-    @NotBlank(message = "O trabalho precisa ser informado")
-    private String trabalho;
-    
-    @Min(message = "A idade precisa ser maior que 0", value = 0L)
-    private int idade;
+    @ManyToOne
+    @JoinColumn(name = "servico_id")
+    private ServicoProtese servico;
+
+    private Integer idade;
 
 
-    public int getId() {
-        return id;
-    }
+    private LocalDate dataAtendimento;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @Enumerated(EnumType.STRING)
+    private StatusAtendimento status = StatusAtendimento.PENDENTE;
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getTrabalho() {
-        return trabalho;
-    }
-
-    public void setTrabalho(String trabalho) {
-        this.trabalho = trabalho;
-    }
-
-    public int getIdade() {
-        return idade;
-    }
-
-    public void setIdade(int idade) {
-        this.idade = idade;
-    }
 }
-
-
-
