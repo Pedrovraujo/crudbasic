@@ -16,8 +16,6 @@ import java.util.Set;
 
 @Configuration
 @RequiredArgsConstructor
-@Getter
-@Setter
 public class AdminUsuarioConfig implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;

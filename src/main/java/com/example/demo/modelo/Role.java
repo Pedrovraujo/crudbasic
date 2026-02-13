@@ -23,7 +23,8 @@ public class Role {
 
         long roleId;
 
-        Values(long roleId){
+        Values(long roleId) {
+            this.roleId = roleId;
         }
     }
 }

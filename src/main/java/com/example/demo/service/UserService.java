@@ -17,7 +17,6 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-@Data
 public class UserService {
 
     private final RoleRepository roleRepository;

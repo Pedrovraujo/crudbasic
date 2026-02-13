@@ -92,10 +92,20 @@ public class PessoaService {
         Pessoa pessoaExistente = acao.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
 
+        Integer usuarioLogadoId = Integer.valueOf(token.getName());
+        boolean isAdmin = token.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("SCOPE_ADMIN"));
+
+        if (!isAdmin && !pessoaExistente.getUsuario().getUserId().equals(usuarioLogadoId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("erro", "Você não tem permissão para editar este registro."));
+        }
+
         mapper.map(dto, pessoaExistente);
 
         if (dto.getServicoId() != null) {
-            var servico = servicoProteseRepository.findById(dto.getServicoId()).orElseThrow();
+            var servico = servicoProteseRepository.findById(dto.getServicoId())
+                    .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
             pessoaExistente.setServico(servico);
         }
 
