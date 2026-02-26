@@ -1,4 +1,13 @@
 package com.example.demo.dto;
 
-public record LoginDTO(String username, String password) {
-}
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginDTO(
+
+        @NotBlank(message = "O username precisa ser informado.")
+        String username,
+
+        @NotBlank(message = "A senha precisa ser informada.")
+        String password
+
+) {}

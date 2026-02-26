@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,14 +18,16 @@ public class ServicoProteseService {
     private final ServicoProteseRepository acao;
     private final ModelMapper mapper;
 
-    public ResponseEntity<?> cadastrar(ServicoProteseDTO dto) {
+    public ResponseEntity<ServicoProteseDTO> cadastrar(ServicoProteseDTO dto) {
         ServicoProtese servico = mapper.map(dto, ServicoProtese.class);
-        return new ResponseEntity<>(acao.save(servico), HttpStatus.CREATED);
+        ServicoProtese salvo = acao.save(servico);
+        return new ResponseEntity<>(mapper.map(salvo, ServicoProteseDTO.class), HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> listar() {
-        return ResponseEntity.ok(acao.findAll().stream()
+    public ResponseEntity<List<ServicoProteseDTO>> listar() {
+        List<ServicoProteseDTO> lista = acao.findAll().stream()
                 .map(s -> mapper.map(s, ServicoProteseDTO.class))
-                .toList());
+                .toList();
+        return ResponseEntity.ok(lista);
     }
 }

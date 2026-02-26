@@ -1,10 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.modelo.ServicoProtese;
 import com.example.demo.modelo.StatusAtendimento;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,13 +12,14 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PessoaDTO {
+public class PessoaCreateDTO {
 
     @NotBlank(message = "O nome precisa ser informado.")
     @Pattern(regexp = "^[\\p{L}\\s]+$", message = "O nome deve conter apenas letras.")
     @Size(min = 3, message = "O nome deve possuir pelo menos três caracteres.")
     private String nome;
 
+    @NotNull(message = "O serviço precisa ser informado.")
     private Integer servicoId;
 
     @NotNull(message = "A idade não pode ser vazia.")
@@ -35,5 +32,4 @@ public class PessoaDTO {
     private LocalDate dataAtendimento;
 
     private StatusAtendimento status;
-
 }

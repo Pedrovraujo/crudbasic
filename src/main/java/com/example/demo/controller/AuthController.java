@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-
 import com.example.demo.dto.LoginDTO;
 import com.example.demo.service.TokenService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +14,8 @@ public class AuthController {
 
     private final TokenService tokenService;
 
-
     @PostMapping
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO) {
         return tokenService.login(loginDTO);
-
     }
-
 }

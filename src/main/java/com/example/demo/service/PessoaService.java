@@ -1,7 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.PessoaDTO;
+import com.example.demo.dto.PessoaCreateDTO;
 import com.example.demo.dto.PessoaResponseDTO;
+import com.example.demo.dto.PessoaUpdateDTO;
 import com.example.demo.modelo.Pessoa;
 import com.example.demo.repository.PessoaRepositorio;
 import com.example.demo.repository.ServicoProteseRepository;
@@ -26,30 +27,60 @@ public class PessoaService {
     private final UsuarioRepository usuarioRepository;
     private final ModelMapper mapper;
 
-    public ResponseEntity<?> cadastrar(PessoaDTO dto, JwtAuthenticationToken token) {
-        var usuario = usuarioRepository.findById(Integer.valueOf(token.getName()))
+    private Integer getUsuarioId(JwtAuthenticationToken token) {
+        try {
+            return Integer.valueOf(token.getName());
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Token inválido: subject não é um ID numérico.");
+        }
+    }
+
+    private boolean isAdmin(JwtAuthenticationToken token) {
+        return token.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("SCOPE_ADMIN"));
+    }
+
+    private boolean temPermissao(Pessoa pessoa, JwtAuthenticationToken token) {
+        return isAdmin(token) || pessoa.getUsuario().getUserId().equals(getUsuarioId(token));
+    }
+
+
+    private Pessoa fromCreateDTO(PessoaCreateDTO dto) {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setNome(dto.getNome());
+        pessoa.setIdade(dto.getIdade());
+        pessoa.setDataAtendimento(dto.getDataAtendimento());
+        pessoa.setStatus(dto.getStatus() != null ? dto.getStatus() : pessoa.getStatus());
+        return pessoa;
+    }
+
+
+    private void applyUpdateDTO(PessoaUpdateDTO dto, Pessoa pessoa) {
+        pessoa.setNome(dto.getNome());
+        pessoa.setIdade(dto.getIdade());
+        pessoa.setDataAtendimento(dto.getDataAtendimento());
+        if (dto.getStatus() != null) {
+            pessoa.setStatus(dto.getStatus());
+        }
+    }
+    public ResponseEntity<PessoaResponseDTO> cadastrar(PessoaCreateDTO dto, JwtAuthenticationToken token) {
+        var usuario = usuarioRepository.findById(getUsuarioId(token))
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         var servico = servicoProteseRepository.findById(dto.getServicoId())
                 .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
-        
-        Pessoa pessoa = mapper.map(dto, Pessoa.class);
 
-        pessoa.setId(null);
-
+        Pessoa pessoa = fromCreateDTO(dto);
         pessoa.setUsuario(usuario);
         pessoa.setServico(servico);
 
-        Pessoa pessoaSalva = acao.save(pessoa);
-        return new ResponseEntity<>(mapper.map(pessoaSalva, PessoaResponseDTO.class), HttpStatus.CREATED);
+        return new ResponseEntity<>(mapper.map(acao.save(pessoa), PessoaResponseDTO.class), HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> selecionar(JwtAuthenticationToken token) {
-        Integer userId = Integer.valueOf(token.getName());
-        boolean isAdmin = token.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("SCOPE_ADMIN"));
-
-        List<Pessoa> pessoas = isAdmin ? acao.findAll() : acao.findByUsuarioUserId(userId);
+    public ResponseEntity<List<PessoaResponseDTO>> selecionar(JwtAuthenticationToken token) {
+        List<Pessoa> pessoas = isAdmin(token)
+                ? acao.findAll()
+                : acao.findByUsuarioUserId(getUsuarioId(token));
 
         return ResponseEntity.ok(pessoas.stream()
                 .map(p -> mapper.map(p, PessoaResponseDTO.class))
@@ -60,11 +91,7 @@ public class PessoaService {
         Pessoa pessoa = acao.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
 
-        Integer usuarioLogadoId = Integer.valueOf(token.getName());
-        boolean isAdmin = token.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("SCOPE_ADMIN"));
-
-        if (!isAdmin && !pessoa.getUsuario().getUserId().equals(usuarioLogadoId)) {
+        if (!temPermissao(pessoa, token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("erro", "Você não tem permissão para visualizar este registro."));
         }
@@ -76,32 +103,25 @@ public class PessoaService {
         Pessoa pessoa = acao.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
 
-        Integer usuarioLogadoId = Integer.valueOf(token.getName());
-        boolean isAdmin = token.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("SCOPE_ADMIN"));
-
-        if (!isAdmin && !pessoa.getUsuario().getUserId().equals(usuarioLogadoId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (!temPermissao(pessoa, token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("erro", "Você não tem permissão para remover este registro."));
         }
 
         acao.delete(pessoa);
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> editar(Integer id, PessoaDTO dto, JwtAuthenticationToken token) {
+    public ResponseEntity<?> editar(Integer id, PessoaUpdateDTO dto, JwtAuthenticationToken token) {
         Pessoa pessoaExistente = acao.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pessoa não encontrada."));
 
-        Integer usuarioLogadoId = Integer.valueOf(token.getName());
-        boolean isAdmin = token.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("SCOPE_ADMIN"));
-
-        if (!isAdmin && !pessoaExistente.getUsuario().getUserId().equals(usuarioLogadoId)) {
+        if (!temPermissao(pessoaExistente, token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("erro", "Você não tem permissão para editar este registro."));
         }
 
-        mapper.map(dto, pessoaExistente);
+        applyUpdateDTO(dto, pessoaExistente);
 
         if (dto.getServicoId() != null) {
             var servico = servicoProteseRepository.findById(dto.getServicoId())
@@ -112,10 +132,10 @@ public class PessoaService {
         return ResponseEntity.ok(mapper.map(acao.save(pessoaExistente), PessoaResponseDTO.class));
     }
 
-    public ResponseEntity<?> listarPorData(LocalDate data, JwtAuthenticationToken token) {
-        Integer userId = Integer.valueOf(token.getName());
-
-        List<Pessoa> pessoas = acao.findByDataAtendimentoAndUsuarioUserId(data, userId);
+    public ResponseEntity<List<PessoaResponseDTO>> listarPorData(LocalDate data, JwtAuthenticationToken token) {
+        List<Pessoa> pessoas = isAdmin(token)
+                ? acao.findByDataAtendimento(data)
+                : acao.findByDataAtendimentoAndUsuarioUserId(data, getUsuarioId(token));
 
         return ResponseEntity.ok(pessoas.stream()
                 .map(p -> mapper.map(p, PessoaResponseDTO.class))
